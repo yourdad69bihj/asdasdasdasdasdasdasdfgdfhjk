@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Js converter | VULCAN ELITE</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00ffff;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px; /* Zoomed-in look */
+            padding: 40px;
+            border: 6px solid #00ffff;
+            border-radius: 30px;
+            box-shadow: 0 0 40px #00ffff;
+            text-align: center;
+            background: rgba(0,0,0,0.95);
+        }
+        h1 { text-shadow: 0 0 15px #00ffff; margin: 0; font-size: 38px; letter-spacing: 3px; font-weight: 900;}
+        .sub-text { color: #ffff00; font-size: 11px; margin-bottom: 30px; font-weight: bold;}
+        
+        /* THE INPUT ZONE */
+        #drop-zone {
+            border: 3px dashed #00ffff;
+            padding: 60px 20px;
+            margin: 25px 0;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        #drop-zone:hover { background: rgba(0, 255, 255, 0.15); border-color: #fff; }
+
+        select, .exec-btn {
+            background: #000;
+            color: #00ffff;
+            border: 3px solid #00ffff;
+            padding: 20px;
+            font-family: inherit;
+            font-weight: 900;
+            width: 100%;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 12px;
+            transition: 0.2s;
+        }
+        .exec-btn:hover { background: #00ffff; color: #000; transform: scale(1.03); }
+        
+        #status { font-size: 14px; color: #00ff00; margin-top: 30px; font-weight: bold; text-transform: uppercase;}
+        #file-input { display: none; }
+        canvas { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌊 Js converter</h1>
+        <div class="sub-text">VULCAN SYSTEM | JS MASTER EDITION</div>
+        
+        <label style="font-size: 13px;">1. TARGET FORMAT</label>
+        <select id="format">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPEG</option>
+            <option value="ico">ICO (ICON)</option>
+            <option value="webp">WEBP</option>
+        </select>
+
+        <div id="drop-zone">
+            DRAG IMAGE HERE<br>OR<br>CLICK TO ADD
+            <input type="file" id="file-input" accept="image/*">
+        </div>
+
+        <button class="exec-btn" id="manual-btn">SELECT FROM FILES</button>
+
+        <div id="status">SYSTEM: READY ✅</div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const manualBtn = document.getElementById('manual-btn');
+        const formatSelect = document.getElementById('format');
+        const status = document.getElementById('status');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // CLICK TO OPEN FILES
+        dropZone.onclick = () => fileInput.click();
+        manualBtn.onclick = () => fileInput.click();
+
+        // DRAG AND DROP LOGIC
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = "#fff"; };
+        dropZone.ondragleave = () => { dropZone.style.borderColor = "#00ffff"; };
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = "#00ffff";
+            const file = e.dataTransfer.files[0];
+            if (file) handleImage(file);
+        };
+
+        // FILE SELECTION LOGIC
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) handleImage(file);
+        };
+
+        function handleImage(file) {
+            status.innerText = "INJECTING: " + file.name.toUpperCase();
+            status.style.color = "#ffff00";
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    const format = formatSelect.value;
+                    const mime = format === "ico" ? "image/x-icon" : `image/${format}`;
+                    const dataUrl = canvas.toDataURL(mime, 0.9);
+                    
+                    downloadResult(dataUrl, format);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function downloadResult(url, ext) {
+            const link = document.createElement('a');
+            link.download = `js_converted_${Date.now()}.${ext}`;
+            link.href = url;
+            link.click();
+            status.innerText = "DOWNLOAD COMPLETE ✅";
+            status.style.color = "#00ff00";
+        }
+    </script>
+</body>
+</html>
